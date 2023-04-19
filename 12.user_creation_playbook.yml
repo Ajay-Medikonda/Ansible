@@ -1,0 +1,24 @@
+---
+- name: Playbook For Creating Multiple User Accounts
+  hosta: all
+  tasks:
+    - name: Create Users
+      user:
+        name: "'testuser200"
+        shell: /bin/bash
+        password: "{{ my_password | password_hash('sha512') }}"
+        update_password: on_create
+
+#To run palybook use following command 
+#ansible-playbook -i alpha/hosts user_creation_playbook.yml 
+
+#To check syntax palybook use following command 
+#ansible-playbook -i alpha/hosts user_creation_playbook.yml --syntax-check
+
+#To dry run palybook use following command 
+#ansible-playbook -i alpha/hosts user_creation_playbook.yml --check
+
+#we had created variable in playbook, the variables can declared in CLI by using
+# --extra-vars as follows
+#ansible-playbook -i alpha/hosts user_creation_playbook.yml --extra-vars "my-password=India@123456"
+

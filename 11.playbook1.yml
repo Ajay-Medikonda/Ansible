@@ -1,0 +1,55 @@
+#Playbook for Insatalling and Configuring Nginx
+- name: Play for Installing Nginx
+  hosts: web
+  tasks:
+    - name: Perform apt update
+      shell: apt update
+    
+    - name: Install Nginx
+      shell: apt install nginx -y
+
+    - name: Start Nginx Service
+      shell: Service ngnix Start
+
+#Playbook for Insatalling and Configuring Nginx
+- name: Play for Creating Testuser 1 & 2
+  hosts: web:app:!db
+  tasks:
+    - name: Creating Test User 1
+      user:
+        name: Testuser1
+        state: present
+    - name: Creating Test User 2
+      user:
+        name: Testuser2
+        state: present
+
+#Playbook for Creating Devuser 1 to 5
+- name: Play for Creating Devuser 1 to 5
+  hosts: web:app:db
+  tasks:
+    - name: Creating Dev User 1 to 10
+      user:
+        name: "{{ items }}"
+        state: present
+      with_items:
+      -Devuser 1
+      -Devuser 2
+      -Devuser 3
+      -Devuser 4
+      -Devuser 5
+
+#Install AWS CLI on App Servers
+- name: Install AWS CLI on App Servers
+  hosts: app
+  tasks:
+    - name: Install unzip on app servers
+      shell: apt install unzip -y
+
+    - name: Download AWS CLI
+      get_url:
+          url: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+          dest: ./awscliv2.zip
+
+    - name: Unzip file & Install
+      shell: unzip awscliv2.zip && ./aws/install

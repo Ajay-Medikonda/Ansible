@@ -1,0 +1,22 @@
+---
+- name: Playbook For Creating Multiple User Accounts
+  hosta: all
+  tasks:
+    - name: Create Users
+      user:
+        name: "'{{ item }}"
+        shell: /bin/bash
+        password: "{{ my_password | password_hash('sha512') }}"
+        update_password: on_create
+      loop:
+        -ajay
+        -krishna
+        -vistnu
+
+      -name: Testing No_Log
+      shell: echo "{{my_password}}"   
+ 
+# Now if we run play book password will be displayed in output, to avoid that 
+#we hase to add No_Log : true as follows
+      No_Log: true
+#Now the password will be hidded

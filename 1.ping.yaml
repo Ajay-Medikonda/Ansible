@@ -1,0 +1,7 @@
+---
+- name: Play for ping all Host Servers
+  hosts: all
+  tasks: 
+   - name: Ping Server
+     ping:
+...

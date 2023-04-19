@@ -1,0 +1,15 @@
+#Playbook using loop
+---
+- hosts: all
+  name: Install Pacakages
+  tsaks:
+   -yum: name="{{items}}"
+    state: present
+  with_items: 
+   - git
+   - httpd
+   - zip
+   - unzip
+   - nano
+   - wget
+... 

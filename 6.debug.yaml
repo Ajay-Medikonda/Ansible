@@ -1,0 +1,23 @@
+---
+- hosts: all
+  vars: 
+  name: Ajay Projects
+
+  tasks:
+  - name: Display the name of variables value
+    debug: 
+     msg: "The variable name value is: {{name}}"
+...
+
+---
+- hosts: all
+  vars: 
+  name: Ajay Projects
+
+  tasks:
+  - name: Display the name of variables value
+    debug: 
+     var: name
+...
+
+#Note: Difference between msg & var is that in msg we can keep customised massage

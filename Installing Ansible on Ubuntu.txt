@@ -1,0 +1,280 @@
+$ sudo apt update
+$ sudo apt install software-properties-common
+$ sudo add-apt-repository --yes --update ppa:ansible/ansible
+$ sudo apt update
+$ sudo apt install ansible
+
+-ansible 2.9.27 
+-config file = /etc/ansible/ansible.cfg
+-configured module search path = [u'/root/.ansible/plugins/modules', u'/usr/share/ansible/plugins/modules']
+-ansible python module location = /usr/lib/python2.7/dist-packages/ansible
+-executable location = /usr/bin/ansible
+-python version = 2.7.17 (default, Nov 28 2022, 18:51:39) [GCC 7.5.0]
+
+Generate public & private key by using ssh-keygen and add public key of controller in
+ authorized_keys of Nodes or clients to establish password less authentication; 
+ authorized_keys will be present in .ssh of Nodes or clients
+
+After adding public key in clients we can login to clients from controller 
+ by using ssh@172.0.6.50 & ssh@172.0.10.90 with out password
+
+Create a folder alpha in Ansible controller server #>mkdir alpha
+Create a folder beta in Ansible controller server #>mkdir beta
+add a file 'hosts' in both aplha and beta folders in which we will add 
+ the details of Nodes or Clients in ini formate
+
+In ini formate is under head we will add node or client private id or host names
+In our alpha folder we will take all_servers as header as follows
+ add Node_1: with private IP > 172.0.6.50 in alpha folder host file 
+ #>[all_servers
+   172.0.6.50.
+
+In our beta folder we will take all_servers as header as follows
+ add Node_2: with private IP > 172.0.10.90 in alpha folder host file 
+ #>[all_servers
+   172.0.10.90.
+
+Now we can do following by using adhoc commands
+ansible -i alpha/hosts all_servers -m ping
+ansible -i beta/hosts all_servers -m ping
+ansible -i alpha/hosts -i beta/hosts all_servers -m ping
+ansible -i alpha/hosts -i beta/hosts all_servers -a 'cat/etc/passwd'
+ansible -i alpha/hosts -i beta/hosts all_servers -a free
+
+-i > Interface
+-m > modules
+-a > Aurgments
+
+To create a user with password
+ansible -i alpha/hosts -i beta/hosts all_servers -m user -a 'name=testuser001 shell=/bin/bash password=India@123456'
+
+Ex: for --syntax-check : will check syntax
+ansible -i alpha/hosts -i beta/hosts all_servers -m user -a 'name=testuser001 shell=/bin/bash password=India@123456' --syntax-check
+
+Ex: for --check : will do Dry Run
+ansible -i alpha/hosts -i beta/hosts all_servers -m user -a 'name=testuser001 shell=/bin/bash password=India@123456' --check
+
+To remove user we use state=absent as follows
+ansible -i alpha/hosts -i beta/hosts all_servers -m user -a 'name=testuser001 state=absent'
+Here test user will be removed
+
+we can give random encripted password by using shell base64 by using following commands
+#openssl rand -base64 32, 32 represents 32 digit password , 
+ instead we can give 16 which will genetart 16 digit password
+
+we can decode base62 code using following command as follows
+say the password generated as CS1tHtPQArARdbjr51yvdg==
+#echo 'CS1tHtPQArARdbjr51yvdg==' | base64 --decode
+
+To create user with password
+ansible -i beta/hosts -i alpha/hosts all_servers -m user -a "name=testuser100 update_password=always password={{ newpassword|password_hash('sha512') }}" -b --extra-vars "newpassword=India@12345"
+
+To check user created or not use # cat .ssh/etc/passwd
+
+#Create a playbook
+---  ==> is to be used on top of playbook to indicate we are writing yaml script
+...  ==> is to be used(optional) on bottom of playbook to indicate we are writing yaml script
+
+- name : Decription of playbook created for
+hosts : on which host this playbook to used or applied
+tasks: what type of job to be done
+user: is an example of module 
+
+#Creating Ansible lab in Docker
+
+docker network create --subnet 172.20.0.0/16 --gateway 172.20.0.254 ansible_nw
+
+ec05b723e2eaef92d76e682229be3d30f42ba16a4f1e8dd5961b410c3b8e1d87
+
+docker run --rm -dit --name controller --hostname controller --network ansible_nw sreeharshav/ubuntu16:ansible2.75_V2
+
+034db9be4ab247747746d967ae460d878704c0c93ed4de34a3dcf0f90bed7893
+
+docker run --rm -dit --name web1 --hostname web1 -p 8000:80 --network ansible_nw sreeharshav/ubuntu16:withssh2.0_V2
+docker run --rm -dit --name web2 --hostname web2 -p 8001:80 --network ansible_nw sreeharshav/ubuntu16:withssh2.0_V2
+docker run --rm -dit --name web3 --hostname web3 -p 8002:80 --network ansible_nw sreeharshav/ubuntu16:withssh2.0_V2
+docker run --rm -dit --name app1 --hostname app1 -p 9000:80 --network ansible_nw sreeharshav/ubuntu16:withssh2.0_V2
+docker run --rm -dit --name app2 --hostname app2 -p 9001:80 --network ansible_nw sreeharshav/ubuntu16:withssh2.0_V2
+docker run --rm -dit --name app3 --hostname app3 -p 9002:80 --network ansible_nw sreeharshav/ubuntu16:withssh2.0_V2
+docker run --rm -dit --name db1 --hostname db1 -p 9003:80 --network ansible_nw sreeharshav/ubuntu16:withssh2.0_V2
+docker run --rm -dit --name db2 --hostname db2 -p 9004:80 --network ansible_nw sreeharshav/ubuntu16:withssh2.0_V2
+docker run --rm -dit --name db3 --hostname db3 -p 9005:80 --network ansible_nw sreeharshav/ubuntu16:withssh2.0_V2
+docker run --rm -dit --name db4 --hostname db4 -p 9006:80 --network ansible_nw sreeharshav/ubuntu16:withssh2.0_V2
+
+docker exec -it controller bash
+cat hosts
+Result
+[web]
+web1
+web2
+web3
+
+[app]
+app1
+app2
+app3
+
+[db]
+db1
+db2
+db3
+db4
+
+#Test connectivety between controller and Clients
+ansible -i hosts all -m ping
+db2 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+web1 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+db1 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+web3 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+web2 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+db4 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+app1 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+app2 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+localhost | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+db3 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+app3 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+
+#To check in order 
+ansible -i hosts all -m ping -f1
+web1 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+web2 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+web3 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+db1 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+db2 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+db3 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+db4 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+localhost | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+app1 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+app2 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+app3 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+
+----------------------------Host-PATTERNS-------------------------------------
+
+#To apply changes on any particular hosts, lets say create a user in web host
+#> ansible -i hosts web -m user -a "name=webuser state=present" -f1
+
+#To apply changes on any particular hosts, lets say create a user in web and app host at a time
+#> ansible -i hosts web:app -m user -a "name=webuser state=present" -f1
+
+#If we want to apply on all servers except particular group we can do the same as follows
+#> ansible -i hosts 'all:!db' -m user -a "name=webuser state=present" -f1 
+
+#If we want to apply on all servers except particular server we can do the same as follows
+#> ansible -i hosts 'all:db:!db3' -m user -a "name=webuser state=present" -f1
+  or
+#> ansible -i hosts 'all:!db3' -m user -a "name=webuser state=present" -f1
+
+#We can also create a seperate group as Ex: [custom] as follows 
+[local]
+localhost
+
+[web]
+web1
+web2
+web3
+
+[app]
+app1
+app2
+app3
+
+[db]
+db1
+db2
+db3
+db4
+
+[custom]
+web1
+app1
+db1
+
+In above we can apply changes on custom alone Here
+
+we can use intersection '&' so result in commonly present in both groups
+#Ex: ansible -i hosts 'all:&custom' -m ping -f1 , Here only servers common in all groups and custom group will ping as follows
+root@controller:/# ansible -i hosts 'all:&custom' -m ping -f1
+db1 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+web1 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+app1 | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+
+
+#Selective hosts in groups and exclude localhost
+ansible -i hosts db[0:3] -a free
+or
+ansible -i hosts db1:db2:db3:db3 -a free

@@ -1,0 +1,10 @@
+#Playbook using loop
+---
+- hosts: all
+  name: Install Pacakages
+  tsaks:
+   -yum: 
+    name: ['git','httpd','zip','unzip','nano','wget']
+    state: present
+... 
+#with_tems getting dippresitated in near future

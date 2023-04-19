@@ -1,0 +1,48 @@
+---
+  - name: Play for Install Nginx on WebServers
+    hosts: web
+    #gather_facts: no
+    tasks:
+       - name: Run Apt Update
+         shell: apt update
+         tags:
+           - update
+       - name: Install Nginx Server
+         apt: >
+           name=nginx
+           state=present
+         tags:
+           - install
+       - name: Copy the files to index destination folder.
+         copy: >
+            src=/tmp/dockertest1/index.html
+            dest=/var/www/html/index.nginx-debian.html
+            owner=root
+            group=root
+            mode=0644
+         tags:
+           - html
+       - name: Copy the style files to  destination folder.
+         copy: >
+            src=/tmp/dockertest1/style.css
+            dest=/var/www/html/style.css
+            owner=root
+            group=root
+            mode=0644
+         tags:
+           - css
+
+       - name: Copy the javascript files to  destination folder.
+         copy: >
+            src=/tmp/dockertest1/scorekeeper.js
+            dest=/var/www/html/scorekeeper.js
+            owner=root
+            group=root
+            mode=0644
+         tags:
+           - js
+
+       - name: restart nginx
+         command: service nginx restart
+         tags:
+          - service

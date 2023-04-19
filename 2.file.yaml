@@ -1,0 +1,13 @@
+---
+- name: Play for Creating file
+  hosts: all
+  become: true
+  tasks:
+   - name: Create a file
+     file:
+      path: /tmp/ajay.sh    #specify the path where the file ajay.sh to be created
+      mode: 0777            #permissions for file
+      owner: root
+      group: root
+      state: touch
+...

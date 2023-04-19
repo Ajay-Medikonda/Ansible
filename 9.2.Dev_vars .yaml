@@ -1,0 +1,6 @@
+Company_Name : Ajay Projects
+Location_Name : Hyderabad
+
+#Note: If we want to take this value, i.e if we are running playbook
+#for Development then we have to pass run time variables while runing the 
+#play book as #ansible-playbook variables.yaml --extra-variables "env:Dev"

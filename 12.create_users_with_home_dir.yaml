@@ -1,0 +1,16 @@
+---
+- hosts: all
+  become: true
+  tasks:
+   - name: Create user
+     user:
+       name: "{{item.username}}"
+       create_home: "{{item.create_home}}"
+     with_items:
+      - {'username': 'ajay', 'create_home': yes}
+      - {'username': 'babu', 'create_home': yes} 
+      - {'username': 'medi', 'create_home': no}
+      - {'username': 'kuma', 'create_home': no}
+...
+
+#only for users with create_home:yes will have home directories

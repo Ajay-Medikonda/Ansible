@@ -1,0 +1,25 @@
+---
+- hosts: all
+  become: true
+  tasks: 
+   - name: Get git version
+     shell: git --version
+     register: gitVersion
+     ignore_errors: yes
+   - name: Display Git is Installed or not
+     when: gitVersion.stdout == ""
+     debug:
+      msg: "Git is not installed"
+   - name: Installing Git
+     when: gitVersion.stdout == ""
+     apt:
+      name: git
+      state: present
+   - name: Get git version
+     shell: git --version
+     register: gitVersion
+   - name: Display Git is Installed or not
+     when: gitVersion.stdout != ""
+     debug:
+      msg: "Git is installed and version is {{ gitVersion.stdout }}"
+...
